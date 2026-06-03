@@ -1,0 +1,225 @@
+import java.io.*;
+import java.util.*;
+
+class Student implements Serializable {
+    private String name;
+    private int rollNumber;
+    private String grade;
+
+    public Student(String name, int rollNumber, String grade) {
+        this.name = name;
+        this.rollNumber = rollNumber;
+        this.grade = grade;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getRollNumber() {
+        return rollNumber;
+    }
+
+    public String getGrade() {
+        return grade;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setGrade(String grade) {
+        this.grade = grade;
+    }
+
+    @Override
+    public String toString() {
+        return "Roll No: " + rollNumber +
+                ", Name: " + name +
+                ", Grade: " + grade;
+    }
+}
+
+public class StudentManagementSystem {
+
+    static ArrayList<Student> students = new ArrayList<>();
+    static final String FILE_NAME = "students.dat";
+
+    public static void addStudent(Scanner sc) {
+        System.out.print("Enter Roll Number: ");
+        int roll = sc.nextInt();
+        sc.nextLine();
+
+        System.out.print("Enter Name: ");
+        String name = sc.nextLine();
+
+        if (name.isEmpty()) {
+            System.out.println("Name cannot be empty!");
+            return;
+        }
+
+        System.out.print("Enter Grade: ");
+        String grade = sc.nextLine();
+
+        students.add(new Student(name, roll, grade));
+        System.out.println("Student Added Successfully!");
+    }
+
+    public static void displayStudents() {
+        if (students.isEmpty()) {
+            System.out.println("No students found.");
+            return;
+        }
+
+        System.out.println("\n----- Student List -----");
+        for (Student s : students) {
+            System.out.println(s);
+        }
+    }
+
+    public static void searchStudent(Scanner sc) {
+        System.out.print("Enter Roll Number to Search: ");
+        int roll = sc.nextInt();
+
+        for (Student s : students) {
+            if (s.getRollNumber() == roll) {
+                System.out.println("Student Found:");
+                System.out.println(s);
+                return;
+            }
+        }
+
+        System.out.println("Student Not Found!");
+    }
+
+    public static void removeStudent(Scanner sc) {
+        System.out.print("Enter Roll Number to Remove: ");
+        int roll = sc.nextInt();
+
+        Iterator<Student> iterator = students.iterator();
+
+        while (iterator.hasNext()) {
+            Student s = iterator.next();
+
+            if (s.getRollNumber() == roll) {
+                iterator.remove();
+                System.out.println("Student Removed Successfully!");
+                return;
+            }
+        }
+
+        System.out.println("Student Not Found!");
+    }
+
+    public static void editStudent(Scanner sc) {
+        System.out.print("Enter Roll Number to Edit: ");
+        int roll = sc.nextInt();
+        sc.nextLine();
+
+        for (Student s : students) {
+            if (s.getRollNumber() == roll) {
+
+                System.out.print("Enter New Name: ");
+                String name = sc.nextLine();
+
+                System.out.print("Enter New Grade: ");
+                String grade = sc.nextLine();
+
+                s.setName(name);
+                s.setGrade(grade);
+
+                System.out.println("Student Updated Successfully!");
+                return;
+            }
+        }
+
+        System.out.println("Student Not Found!");
+    }
+
+    public static void saveToFile() {
+        try {
+            ObjectOutputStream out =
+                    new ObjectOutputStream(new FileOutputStream(FILE_NAME));
+
+            out.writeObject(students);
+            out.close();
+
+            System.out.println("Data Saved Successfully!");
+        } catch (Exception e) {
+            System.out.println("Error Saving Data.");
+        }
+    }
+
+    public static void loadFromFile() {
+        try {
+            ObjectInputStream in =
+                    new ObjectInputStream(new FileInputStream(FILE_NAME));
+
+            students = (ArrayList<Student>) in.readObject();
+            in.close();
+
+        } catch (Exception e) {
+            System.out.println("No Previous Data Found.");
+        }
+    }
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        loadFromFile();
+
+        int choice;
+
+        do {
+            System.out.println("\n===== STUDENT MANAGEMENT SYSTEM =====");
+            System.out.println("1. Add Student");
+            System.out.println("2. Display Students");
+            System.out.println("3. Search Student");
+            System.out.println("4. Remove Student");
+            System.out.println("5. Edit Student");
+            System.out.println("6. Save Data");
+            System.out.println("7. Exit");
+            System.out.print("Enter Choice: ");
+
+            choice = sc.nextInt();
+
+            switch (choice) {
+                case 1:
+                    addStudent(sc);
+                    break;
+
+                case 2:
+                    displayStudents();
+                    break;
+
+                case 3:
+                    searchStudent(sc);
+                    break;
+
+                case 4:
+                    removeStudent(sc);
+                    break;
+
+                case 5:
+                    editStudent(sc);
+                    break;
+
+                case 6:
+                    saveToFile();
+                    break;
+
+                case 7:
+                    saveToFile();
+                    System.out.println("Exiting...");
+                    break;
+
+                default:
+                    System.out.println("Invalid Choice!");
+            }
+
+        } while (choice != 7);
+
+        sc.close();
+    }
+}
